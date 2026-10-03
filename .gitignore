@@ -1,2 +1,16 @@
 evnv/
-transcipciones/
+# Sistema y editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Secretos
+.env
+*.env.local
+
+# Datos de la app (audios y transcripciones)
+backend/uploads/
+backend/data/
+*.sqlite3
+*.db
