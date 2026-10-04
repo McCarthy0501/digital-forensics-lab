@@ -6,66 +6,29 @@ import {
   useState,
   type ChangeEvent,
   type DragEvent,
-  type ReactNode,
   type RefObject,
 } from 'react'
-import type { FileStatus,UploadedFile } from '../types/dasboardHome'
-import { ACCEPTED_EXTENSIONS,MAX_FILE_SIZE } from '../consts/fileFormants'
-
-
-
-const railItems: { label: string; icon: ReactNode; active?: boolean }[] = [
-  { label: 'Dashboard', icon: <GridIcon />, active: true },
-  { label: 'Transcripciones', icon: <WaveIcon /> },
-  { label: 'Proyectos', icon: <FolderIcon /> },
-  { label: 'Ajustes', icon: <SettingsIcon /> },
-]
-
-const stats = [
-  { label: 'Archivos', value: '128', hint: '+12 esta semana', icon: <FileIcon /> },
-  { label: 'Minutos procesados', value: '1.284', hint: '+8,3% vs. mes pasado', icon: <ClockIcon /> },
-  { label: 'Transcripciones', value: '94', hint: '6 en cola', icon: <WaveIcon /> },
-  { label: 'Precisión media', value: '98,2%', hint: 'Whisper large-v3', icon: <SparkIcon /> },
-]
-
-const recentTranscriptions = [
-  { name: 'Entrevista_producto.mp3', duration: '12:48', status: 'completado' as FileStatus, date: 'Hoy' },
-  { name: 'Reunión_sprint_14.wav', duration: '34:02', status: 'procesando' as FileStatus, date: 'Hace 5 min' },
-  { name: 'Podcast_episodio_07.m4a', duration: '48:15', status: 'completado' as FileStatus, date: 'Ayer' },
-  { name: 'Nota_voz_cliente.ogg', duration: '02:31', status: 'error' as FileStatus, date: 'Hace 2 días' },
-  { name: 'Clase_historia.mp3', duration: '56:20', status: 'completado' as FileStatus, date: 'Hace 3 días' },
-]
-
-const statusStyles: Record<FileStatus, string> = {
-  listo: 'bg-slate-500/15 text-slate-300 ring-slate-400/30',
-  procesando: 'bg-amber-500/15 text-amber-300 ring-amber-400/30',
-  completado: 'bg-emerald-500/15 text-emerald-300 ring-emerald-400/30',
-  error: 'bg-rose-500/15 text-rose-300 ring-rose-400/30',
-}
-
-const statusLabels: Record<FileStatus, string> = {
-  listo: 'Listo',
-  procesando: 'Procesando',
-  completado: 'Completado',
-  error: 'Error',
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B'
-  const units = ['B', 'KB', 'MB', 'GB']
-  const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1)
-  const value = bytes / Math.pow(1024, index)
-  return `${value.toFixed(value >= 10 || index === 0 ? 0 : 1)} ${units[index]}`
-}
-
-function getExtension(name: string): string {
-  return name.split('.').pop()?.toLowerCase() ?? ''
-}
-
-function isAudioFile(file: File): boolean {
-  if (file.type.startsWith('audio/') || file.type.startsWith('video/')) return true
-  return ACCEPTED_EXTENSIONS.includes(getExtension(file.name))
-}
+import {
+  BellIcon,
+  CloseIcon,
+  FolderIcon,
+  PauseIcon,
+  PlayIcon,
+  SearchIcon,
+  TrendIcon,
+  UploadIcon,
+  WaveIcon,
+} from './icons'
+import {
+  NAV_ITEMS,
+  RECENT_TRANSCRIPTIONS,
+  STATS,
+  STATUS_LABELS,
+  STATUS_STYLES,
+} from '../consts/dashboardHomeConsts'
+import { FILE_ACCEPT_ATTRIBUTE, MAX_FILE_SIZE } from '../consts/fileFormats'
+import type { UploadedFile } from '../types/dashboardHome'
+import { formatBytes, getExtension, isAudioFile } from '../utils/file'
 
 export default function DashboardHome() {
   const [files, setFiles] = useState<UploadedFile[]>([])
@@ -99,7 +62,7 @@ export default function DashboardHome() {
         return
       }
       if (file.size > MAX_FILE_SIZE) {
-        rejected.push(`${file.name} (supera 200 MB)`)
+        rejected.push(`${file.name} (supera ${formatBytes(MAX_FILE_SIZE)})`)
         return
       }
       next.push({
@@ -297,7 +260,7 @@ function UploadCard({
       <div className="mb-5 flex items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold text-white">Sube tu audio</h2>
-          <p className="text-sm text-slate-400">Formatos: MP3, WAV, M4A, OGG, FLAC, WEBM · máx. 200 MB</p>
+          <p className="text-sm text-slate-400">Formatos: MP3, WAV, M4A, OGG, FLAC, WEBM · máx. {formatBytes(MAX_FILE_SIZE)}</p>
         </div>
         {files.length > 0 && (
           <button
@@ -366,7 +329,7 @@ function UploadCard({
         <input
           ref={inputRef}
           type="file"
-          accept="audio/*,video/*,.mp3,.wav,.m4a,.aac,.ogg,.webm,.flac"
+          accept={FILE_ACCEPT_ATTRIBUTE}
           multiple
           onChange={onInputChange}
           className="hidden"
@@ -434,8 +397,8 @@ function FileRow({ file, isPlaying, onRemove, onTogglePlay }: FileRowProps) {
         </p>
       </div>
 
-      <span className={`hidden rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 sm:inline ${statusStyles[file.status]}`}>
-        {statusLabels[file.status]}
+      <span className={`hidden rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 sm:inline ${STATUS_STYLES[file.status]}`}>
+        {STATUS_LABELS[file.status]}
       </span>
 
       <button
@@ -461,7 +424,7 @@ function RecentList() {
       </div>
 
       <ul className="space-y-1">
-        {recentTranscriptions.map((item) => (
+        {RECENT_TRANSCRIPTIONS.map((item) => (
           <li
             key={item.name}
             className="flex items-center gap-3 rounded-xl p-3 transition hover:bg-white/[0.04]"
@@ -475,8 +438,8 @@ function RecentList() {
                 {item.duration} · {item.date}
               </p>
             </div>
-            <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ${statusStyles[item.status]}`}>
-              {statusLabels[item.status]}
+            <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ${STATUS_STYLES[item.status]}`}>
+              {STATUS_LABELS[item.status]}
             </span>
           </li>
         ))}
@@ -488,22 +451,25 @@ function RecentList() {
 function StatsGrid() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {stats.map((stat) => (
-        <div
-          key={stat.label}
-          className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-5 shadow-lg shadow-black/20 backdrop-blur-xl transition hover:border-violet-400/30 hover:bg-white/[0.05]"
-        >
-          <div className="flex items-center justify-between">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500/25 to-fuchsia-500/25 text-violet-200 ring-1 ring-white/10">
-              {stat.icon}
-            </span>
-            <TrendIcon className="h-4 w-4 text-emerald-400/70" />
+      {STATS.map((stat) => {
+        const Icon = stat.icon
+        return (
+          <div
+            key={stat.label}
+            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-5 shadow-lg shadow-black/20 backdrop-blur-xl transition hover:border-violet-400/30 hover:bg-white/[0.05]"
+          >
+            <div className="flex items-center justify-between">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500/25 to-fuchsia-500/25 text-violet-200 ring-1 ring-white/10">
+                <Icon className="h-5 w-5" />
+              </span>
+              <TrendIcon className="h-4 w-4 text-emerald-400/70" />
+            </div>
+            <p className="mt-4 text-2xl font-semibold text-white">{stat.value}</p>
+            <p className="text-sm text-slate-400">{stat.label}</p>
+            <p className="mt-1 text-xs text-slate-500">{stat.hint}</p>
           </div>
-          <p className="mt-4 text-2xl font-semibold text-white">{stat.value}</p>
-          <p className="text-sm text-slate-400">{stat.label}</p>
-          <p className="mt-1 text-xs text-slate-500">{stat.hint}</p>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
@@ -522,20 +488,23 @@ function Sidebar() {
       </div>
 
       <nav className="mt-8 space-y-1">
-        {railItems.map((item) => (
-          <button
-            key={item.label}
-            type="button"
-            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-              item.active
-                ? 'bg-gradient-to-r from-violet-600/30 to-fuchsia-600/20 text-white ring-1 ring-violet-400/30'
-                : 'text-slate-400 hover:bg-white/5 hover:text-slate-100'
-            }`}
-          >
-            <span className="h-4 w-4">{item.icon}</span>
-            {item.label}
-          </button>
-        ))}
+        {NAV_ITEMS.map((item) => {
+          const Icon = item.icon
+          return (
+            <button
+              key={item.label}
+              type="button"
+              className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+                item.active
+                  ? 'bg-gradient-to-r from-violet-600/30 to-fuchsia-600/20 text-white ring-1 ring-violet-400/30'
+                  : 'text-slate-400 hover:bg-white/5 hover:text-slate-100'
+              }`}
+            >
+              <Icon className="h-4 w-4" />
+              {item.label}
+            </button>
+          )
+        })}
       </nav>
 
       <div className="mt-auto rounded-2xl border border-white/10 bg-gradient-to-br from-violet-600/20 to-fuchsia-600/10 p-4">
@@ -588,130 +557,5 @@ function Topbar() {
         </div>
       </div>
     </header>
-  )
-}
-
-type IconProps = { className?: string }
-
-function UploadIcon({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-      <path d="M17 8l-5-5-5 5" />
-      <path d="M12 3v12" />
-    </svg>
-  )
-}
-
-function WaveIcon({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 12h2l2-7 3 16 3-11 2 5 1.5-3H21" />
-    </svg>
-  )
-}
-
-function GridIcon({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="3" width="7" height="7" rx="1.5" />
-      <rect x="14" y="3" width="7" height="7" rx="1.5" />
-      <rect x="3" y="14" width="7" height="7" rx="1.5" />
-      <rect x="14" y="14" width="7" height="7" rx="1.5" />
-    </svg>
-  )
-}
-
-function FolderIcon({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-    </svg>
-  )
-}
-
-function SettingsIcon({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="3" />
-      <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.9 19.3a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.7 15a1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.7 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.7a1.7 1.7 0 0 0 1.03-1.56V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15 4.7a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.3 9v.09a1.7 1.7 0 0 0 1.56 1.03H21a2 2 0 1 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15z" />
-    </svg>
-  )
-}
-
-function FileIcon({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14 3v5h5" />
-      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
-    </svg>
-  )
-}
-
-function ClockIcon({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 7v5l3 2" />
-    </svg>
-  )
-}
-
-function SparkIcon({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8" />
-    </svg>
-  )
-}
-
-function PlayIcon({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M8 5v14l11-7z" />
-    </svg>
-  )
-}
-
-function PauseIcon({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
-    </svg>
-  )
-}
-
-function CloseIcon({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 6 6 18M6 6l12 12" />
-    </svg>
-  )
-}
-
-function SearchIcon({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="11" cy="11" r="7" />
-      <path d="m20 20-3.5-3.5" />
-    </svg>
-  )
-}
-
-function BellIcon({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
-      <path d="M13.7 21a2 2 0 0 1-3.4 0" />
-    </svg>
-  )
-}
-
-function TrendIcon({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <path d="m3 17 6-6 4 4 8-8" />
-      <path d="M17 7h4v4" />
-    </svg>
   )
 }
