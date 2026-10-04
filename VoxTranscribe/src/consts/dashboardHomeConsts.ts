@@ -12,8 +12,7 @@ import type { FileStatus, NavItem, RecentTranscription, Stat } from '../types/da
 export const NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard', icon: GridIcon, active: true },
   { label: 'Transcripciones', icon: WaveIcon },
-  { label: 'Proyectos', icon: FolderIcon },
-  { label: 'Ajustes', icon: SettingsIcon },
+ 
 ]
 
 export const STATS: Stat[] = [
