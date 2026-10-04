@@ -1,12 +1,15 @@
 
+import DashboardHome from './components/dashboardHome'
 import './App.css'
 
 function App() {
 
   return (
-    <>
-      <h1>Hola Mundo</h1>
-    </>
+  
+     <>
+     <DashboardHome/>
+     </>
+    
   )
 }
 
