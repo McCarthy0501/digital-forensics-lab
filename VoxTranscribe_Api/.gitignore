@@ -1,0 +1,51 @@
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Secretos y configuración local
+.env
+.env.*
+!.env.example
+
+# Pruebas y herramientas
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Empaquetado
+*.egg-info/
+build/
+dist/
+
+# Datos de la app (privados)
+uploads/
+data/
+audios/
+transcriptions/
+*.sqlite3
+*.db
+
+# Modelos de Whisper (pesados)
+/whisper_models/
+.cache/
+*.bin
+*.pt
+*.gguf
+
+# Logs
+*.log
+
+# Editor y sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
