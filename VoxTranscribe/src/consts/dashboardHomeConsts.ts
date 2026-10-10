@@ -1,9 +1,7 @@
 import {
   ClockIcon,
   FileIcon,
-  FolderIcon,
   GridIcon,
-  SettingsIcon,
   SparkIcon,
   WaveIcon,
 } from '../components/icons'

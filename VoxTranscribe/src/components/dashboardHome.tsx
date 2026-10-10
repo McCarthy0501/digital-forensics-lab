@@ -506,8 +506,6 @@ function Sidebar() {
           )
         })}
       </nav>
-
-  
     </aside>
   )
 }
@@ -540,7 +538,6 @@ function Topbar() {
           <BellIcon className="h-4 w-4" />
           <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-fuchsia-500" />
         </button>
-        
       </div>
     </header>
   )

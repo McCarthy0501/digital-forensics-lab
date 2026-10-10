@@ -1,4 +1,4 @@
-evnv/
+env/
 # Sistema y editor
 .DS_Store
 Thumbs.db
@@ -10,8 +10,8 @@ Thumbs.db
 *.env.local
 
 # Datos de la app (audios y transcripciones)
-backend/uploads/
-backend/data/
+VoxTranscribe_Api/uploads/
+VoxTranscribe_Api/data/
 *.sqlite3
 *.db
 
