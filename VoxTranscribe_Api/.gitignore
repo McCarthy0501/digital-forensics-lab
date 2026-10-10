@@ -27,7 +27,6 @@ build/
 dist/
 
 # Datos de la app (privados)
-uploads/
 data/
 audios/
 transcriptions/
@@ -49,3 +48,9 @@ transcriptions/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Archivos temporales de la app
+storage/uploads/*
+!storage/uploads/.gitkeep
+storage/converted/*
+!storage/converted/.gitkeep
